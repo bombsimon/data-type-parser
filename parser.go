@@ -5,10 +5,10 @@ import (
 )
 
 type Ast struct {
-	Name        string
-	DataType    string
-	Children    []Ast
-	ExtraTokens []TokenType
+	Name        string      `json:",omitempty"`
+	DataType    string      `json:",omitempty"`
+	Children    []Ast       `json:",omitempty"`
+	ExtraTokens []TokenType `json:",omitempty"`
 }
 
 type Parser struct {
@@ -162,7 +162,7 @@ func (p *Parser) ParseIdent() (Ast, bool) {
 }
 
 func (p *Parser) ParseExtraTokens() []TokenType {
-	extraTokens := []TokenType{}
+	var extraTokens []TokenType
 
 	for {
 		t := p.Lexer.Peek()

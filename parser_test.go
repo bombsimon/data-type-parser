@@ -17,8 +17,7 @@ func TestParse(t *testing.T) {
 			dataType:    "STRING",
 			expected: []Ast{
 				{
-					DataType:    "STRING",
-					ExtraTokens: []TokenType{},
+					DataType: "STRING",
 				},
 			},
 		},
@@ -31,9 +30,8 @@ func TestParse(t *testing.T) {
 					ExtraTokens: []TokenType{TokenNotNull},
 					Children: []Ast{
 						{
-							Name:        "id",
-							DataType:    "INT",
-							ExtraTokens: []TokenType{},
+							Name:     "id",
+							DataType: "INT",
 						},
 						{
 							Name:        "name",
@@ -64,8 +62,7 @@ func TestParse(t *testing.T) {
 						>`,
 			expected: []Ast{
 				{
-					DataType:    "STRUCT",
-					ExtraTokens: []TokenType{},
+					DataType: "STRUCT",
 					Children: []Ast{
 						{
 							Name:        "customer_id",
@@ -73,28 +70,23 @@ func TestParse(t *testing.T) {
 							ExtraTokens: []TokenType{TokenNotNull},
 						},
 						{
-							Name:        "order_details",
-							DataType:    "ARRAY",
-							ExtraTokens: []TokenType{},
+							Name:     "order_details",
+							DataType: "ARRAY",
 							Children: []Ast{
 								{
-									DataType:    "STRUCT",
-									ExtraTokens: []TokenType{},
+									DataType: "STRUCT",
 									Children: []Ast{
 										{
-											Name:        "product_id",
-											DataType:    "STRING",
-											ExtraTokens: []TokenType{},
+											Name:     "product_id",
+											DataType: "STRING",
 										},
 										{
-											Name:        "quantity",
-											DataType:    "INT64",
-											ExtraTokens: []TokenType{},
+											Name:     "quantity",
+											DataType: "INT64",
 										},
 										{
-											Name:        "price",
-											DataType:    "FLOAT64",
-											ExtraTokens: []TokenType{},
+											Name:     "price",
+											DataType: "FLOAT64",
 										},
 									},
 								},
@@ -106,24 +98,20 @@ func TestParse(t *testing.T) {
 							ExtraTokens: []TokenType{TokenNotNull},
 							Children: []Ast{
 								{
-									Name:        "street",
-									DataType:    "STRING",
-									ExtraTokens: []TokenType{},
+									Name:     "street",
+									DataType: "STRING",
 								},
 								{
-									Name:        "city",
-									DataType:    "STRING",
-									ExtraTokens: []TokenType{},
+									Name:     "city",
+									DataType: "STRING",
 								},
 								{
-									Name:        "state",
-									DataType:    "STRING",
-									ExtraTokens: []TokenType{},
+									Name:     "state",
+									DataType: "STRING",
 								},
 								{
-									Name:        "zip_code",
-									DataType:    "STRING",
-									ExtraTokens: []TokenType{},
+									Name:     "zip_code",
+									DataType: "STRING",
 								},
 							},
 						},
