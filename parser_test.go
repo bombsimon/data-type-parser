@@ -145,6 +145,31 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "Array of structs",
+			dataType:    "ARRAY<STRUCT<bar INT NOT NULL, baz STRING>>",
+			expected: []Ast{
+				{
+					DataType: "ARRAY",
+					Children: []Ast{
+						{
+							DataType: "STRUCT",
+							Children: []Ast{
+								{
+									Name:        "bar",
+									DataType:    "INT",
+									ExtraTokens: []TokenType{TokenNotNull},
+								},
+								{
+									Name:     "baz",
+									DataType: "STRING",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	} {
 		t.Run(tc.description, func(t *testing.T) {
 			lexer := NewLexer([]byte(tc.dataType))
