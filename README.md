@@ -4,6 +4,10 @@ This is a tiny parser to parse data types from warehouses. It's intended to be a
 naive generic way to convert a datatype to an AST and that way making it easy to
 fetch recursive data types.
 
+> [!NOTE]
+> This is in early development and mostly serves as a proof of concept. A lot of
+> types and syntax is missing so it's not useful for production use!
+
 ```go
 func parse() {
     lexer := dtp.NewLexer([]byte("ARRAY<STRUCT<bar INT NOT NULL, baz STRING>>"))
