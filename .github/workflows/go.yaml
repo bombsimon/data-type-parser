@@ -1,0 +1,41 @@
+---
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  golangci-lint:
+    name: golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.59.1
+
+  tests:
+    name: tests
+    needs: golangci-lint
+    strategy:
+      matrix:
+        go:
+          - oldstable
+          - stable
+        os:
+          - ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Test code
+        run: go test -race -v ./...
