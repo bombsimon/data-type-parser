@@ -22,6 +22,32 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
+			description: "Number on type",
+			dataType:    "STRING(10)",
+			expected: []Ast{
+				{
+					DataType: "STRING",
+					Size:     10,
+				},
+			},
+		},
+		{
+			description: "Number in struct",
+			dataType:    "STRUCT<a STRING(10)>",
+			expected: []Ast{
+				{
+					DataType: "STRUCT",
+					Children: []Ast{
+						{
+							Name:     "a",
+							DataType: "STRING",
+							Size:     10,
+						},
+					},
+				},
+			},
+		},
+		{
 			description: "Struct",
 			dataType:    "STRUCT<id INT, name STRING NOT NULL> NOT NULL",
 			expected: []Ast{

@@ -2,11 +2,13 @@ package dtp
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type Ast struct {
 	Name        string      `json:",omitempty"`
 	DataType    string      `json:",omitempty"`
+	Size        int         `json:",omitempty"`
 	Children    []Ast       `json:",omitempty"`
 	ExtraTokens []TokenType `json:",omitempty"`
 }
@@ -43,6 +45,7 @@ func (p *Parser) ParseTop() (Ast, bool) {
 			return Ast{
 				DataType:    t.Value,
 				ExtraTokens: p.ParseExtraTokens(),
+				Size:        p.ParseSize(),
 			}, true
 		}
 
@@ -133,6 +136,7 @@ func (p *Parser) ParseIdent() (Ast, bool) {
 		return Ast{
 			Name:        name.Value,
 			DataType:    typ.Value,
+			Size:        p.ParseSize(),
 			ExtraTokens: p.ParseExtraTokens(),
 		}, true
 	case TokenStruct:
@@ -159,6 +163,36 @@ func (p *Parser) ParseIdent() (Ast, bool) {
 	}
 
 	return Ast{}, false
+}
+
+func (p *Parser) ParseSize() int {
+	var (
+		size int
+		err  error
+	)
+
+	if lparen := p.Lexer.Peek(); lparen == nil || lparen.Type != TokenLParen {
+		// No number type specified.
+		return size
+	}
+
+	p.Lexer.Next() // Consume `(`
+
+	sizeStr := p.Lexer.Next()
+	if sizeStr == nil || sizeStr.Type != TokenNumber {
+		panic("Expected size on type")
+	}
+
+	sizeInt, err := strconv.Atoi(sizeStr.Value)
+	if err != nil {
+		panic("Size is not an integer")
+	}
+
+	size = sizeInt
+
+	p.Lexer.Next() // Consume `)`
+
+	return size
 }
 
 func (p *Parser) ParseExtraTokens() []TokenType {

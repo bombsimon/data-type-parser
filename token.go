@@ -2,6 +2,7 @@ package dtp
 
 import (
 	"bytes"
+	"strconv"
 	"unicode"
 )
 
@@ -21,6 +22,7 @@ type TokenType string
 
 const (
 	TokenIdent   TokenType = "IDENT"
+	TokenNumber  TokenType = "NUMBER"
 	TokenLess    TokenType = "<"
 	TokenGreater TokenType = ">"
 	TokenLParen  TokenType = "("
@@ -101,6 +103,13 @@ func (l *Lexer) Next() *Token {
 			}
 
 			buf.Write(l.data[start:l.pos])
+
+			if _, err := strconv.Atoi(buf.String()); err == nil {
+				return &Token{
+					Type:  TokenNumber,
+					Value: buf.String(),
+				}
+			}
 
 			tokenType, ok := TokenMap[buf.String()]
 			if !ok {
