@@ -55,6 +55,7 @@ linters:
     - paralleltest
     - perfsprint
     - prealloc
+    - tagliatelle
     - testpackage
     - varnamelen
     - wrapcheck
