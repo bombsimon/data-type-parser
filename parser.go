@@ -59,8 +59,8 @@ func (p *Parser) ParseTop() (Ast, bool) {
 		// wasn't an ident but a complex type so we parse it and set our ident
 		// as the name for the complex type.
 		if i.DataType == "" {
-			top, ok := p.ParseTop()
-			if !ok {
+			top, tOk := p.ParseTop()
+			if !tOk {
 				panic("Expected data type")
 			}
 
