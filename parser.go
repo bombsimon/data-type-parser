@@ -17,6 +17,12 @@ type Parser struct {
 	Lexer *Lexer
 }
 
+func NewParser(data string) *Parser {
+	return &Parser{
+		Lexer: NewLexer([]byte(data)),
+	}
+}
+
 func (p *Parser) Parse() []Ast {
 	ast := []Ast{}
 

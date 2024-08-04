@@ -32,8 +32,7 @@ func main() {
 		dt = os.Args[1]
 	}
 
-	lexer := dtp.NewLexer([]byte(dt))
-	parser := dtp.Parser{Lexer: lexer}
+	parser := dtp.NewParser(dt)
 	ast := parser.Parse()
 
 	printASTJSON(ast)

@@ -172,9 +172,7 @@ func TestParse(t *testing.T) {
 		},
 	} {
 		t.Run(tc.description, func(t *testing.T) {
-			lexer := NewLexer([]byte(tc.dataType))
-			parser := Parser{Lexer: lexer}
-
+			parser := NewParser(tc.dataType)
 			assert.Equal(t, tc.expected, parser.Parse())
 		})
 	}
