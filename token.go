@@ -6,11 +6,14 @@ import (
 	"unicode"
 )
 
+// Lexer represents a lexer/tokenizer that parses the input stream into valuable
+// tokens that can be used by the parser.
 type Lexer struct {
 	data []byte
 	pos  int
 }
 
+// NewLexer creates a new lexer over the passed data.
 func NewLexer(data []byte) *Lexer {
 	return &Lexer{
 		data: data,
@@ -18,8 +21,10 @@ func NewLexer(data []byte) *Lexer {
 	}
 }
 
+// TokenType represents a type of token.
 type TokenType string
 
+// List of available tokens.
 const (
 	TokenIdent   TokenType = "IDENT"
 	TokenNumber  TokenType = "NUMBER"
@@ -41,11 +46,15 @@ var TokenMap = map[string]TokenType{
 	"ARRAY":  TokenArray,
 }
 
+// A token is a wrapper over a token for tokens that can contain values. This is
+// most of the time only idents or numbers where the value would be the actual
+// value from the stream and the type would be a known token type.
 type Token struct {
 	Type  TokenType
 	Value string
 }
 
+// Next returns the next token in the stream or nil if the stream is ended.
 func (l *Lexer) Next() *Token {
 	if l.pos >= len(l.data) {
 		return nil
@@ -126,6 +135,7 @@ func (l *Lexer) Next() *Token {
 	return nil
 }
 
+// Peek peeks at the next token in the stream without consuming it.
 func (l *Lexer) Peek() *Token {
 	pos := l.pos
 	defer func() {
