@@ -47,11 +47,11 @@ func printASTJSON(ast []dtp.Ast) {
 func printAST(ast []dtp.Ast, path []string) {
 	for _, a := range ast {
 		switch a.DataType {
-		case string(dtp.TokenArray), string(dtp.TokenStruct):
+		case "ARRAY", "STRUCT", "RECORD", "RANGE":
 			p := path
 			if a.Name != "" {
 				p = append(p, a.Name)
-				fmt.Printf("%-30s %s\n", strings.Join(p, "."), a.DataType)
+				fmt.Printf("%-40s %s\n", strings.Join(p, "."), a.DataType)
 			}
 
 			printAST(a.Children, p)
@@ -59,7 +59,7 @@ func printAST(ast []dtp.Ast, path []string) {
 			p := path
 			p = append(p, a.Name)
 
-			fmt.Printf("%-30s %s\n", strings.Join(p, "."), a.DataType)
+			fmt.Printf("%-40s %s\n", strings.Join(p, "."), a.DataType)
 		}
 	}
 }

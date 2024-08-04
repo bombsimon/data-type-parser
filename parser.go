@@ -79,12 +79,12 @@ func (p *Parser) ParseTop() (Ast, bool) {
 		}
 
 		return i, ok
-	case TokenStruct, TokenArray:
+	case TokenContainer:
 		p.Lexer.Next() // Consuem `<` or `(`
 
 		return Ast{
 			Name:        "",
-			DataType:    string(t.Type),
+			DataType:    string(t.Value),
 			Children:    p.ParseContainer(),
 			ExtraTokens: p.ParseExtraTokens(),
 		}, true
@@ -145,9 +145,19 @@ func (p *Parser) ParseIdent(ident string) (Ast, bool) {
 		}, true
 	}
 
-	if typ.Type != TokenIdent {
+	// If the next token is a container token we know the ident is the name so
+	// return the name and continue to parse recursively.
+	if typ.Type == TokenContainer {
 		return Ast{
 			Name: ident,
+		}, true
+	}
+
+	// All other token types that's not an ident mean something like a closing
+	// container token or similar.
+	if typ.Type != TokenIdent {
+		return Ast{
+			DataType: ident,
 		}, true
 	}
 

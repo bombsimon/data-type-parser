@@ -26,24 +26,25 @@ type TokenType string
 
 // List of available tokens.
 const (
-	TokenIdent   TokenType = "IDENT"
-	TokenNumber  TokenType = "NUMBER"
-	TokenLess    TokenType = "<"
-	TokenGreater TokenType = ">"
-	TokenLParen  TokenType = "("
-	TokenRParen  TokenType = ")"
-	TokenComma   TokenType = ","
-	TokenStruct  TokenType = "STRUCT"
-	TokenArray   TokenType = "ARRAY"
-	TokenNotNull TokenType = "NOT NULL"
-	TokenNewline TokenType = "\n"
-	TokenEOF     TokenType = ""
+	TokenIdent     TokenType = "IDENT"
+	TokenNumber    TokenType = "NUMBER"
+	TokenLess      TokenType = "<"
+	TokenGreater   TokenType = ">"
+	TokenLParen    TokenType = "("
+	TokenRParen    TokenType = ")"
+	TokenComma     TokenType = ","
+	TokenContainer TokenType = "CONTAINER"
+	TokenNotNull   TokenType = "NOT NULL"
+	TokenNewline   TokenType = "\n"
+	TokenEOF       TokenType = ""
 )
 
 //nolint:gochecknoglobals // Needed for now
-var TokenMap = map[string]TokenType{
-	"STRUCT": TokenStruct,
-	"ARRAY":  TokenArray,
+var TokenMap = map[string]struct{}{
+	"STRUCT": {},
+	"ARRAY":  {},
+	"RANGE":  {},
+	"RECORD": {},
 }
 
 // A token is a wrapper over a token for tokens that can contain values. This is
@@ -120,9 +121,9 @@ func (l *Lexer) Next() *Token {
 				}
 			}
 
-			tokenType, ok := TokenMap[buf.String()]
-			if !ok {
-				tokenType = TokenIdent
+			tokenType := TokenIdent
+			if _, tokenIsContainer := TokenMap[buf.String()]; tokenIsContainer {
+				tokenType = TokenContainer
 			}
 
 			return &Token{
