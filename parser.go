@@ -84,7 +84,7 @@ func (p *Parser) ParseTop() (Ast, bool) {
 
 		return Ast{
 			Name:        "",
-			DataType:    string(t.Value),
+			DataType:    t.Value,
 			Children:    p.ParseContainer(),
 			ExtraTokens: p.ParseExtraTokens(),
 		}, true
