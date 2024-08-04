@@ -10,8 +10,7 @@ fetch recursive data types.
 
 ```go
 func parse() {
-    lexer := dtp.NewLexer([]byte("ARRAY<STRUCT<bar INT NOT NULL, baz STRING>>"))
-    parser := dtp.Parser{Lexer: lexer}
+    parser := dtp.NewParser("ARRAY<STRUCT<foo INT NOT NULL, bar STRING, baz RECORD<a INT, b FLOAT64>>>")
     ast := parser.Parse()
 
     j, _ := json.MarshalIndent(ast, "", "  ")
@@ -28,22 +27,35 @@ func parse() {
         "DataType": "STRUCT",
         "Children": [
           {
-            "Name": "bar",
+            "Name": "foo",
             "DataType": "INT",
             "ExtraTokens": [
               "NOT NULL"
             ]
           },
           {
-            "Name": "baz",
+            "Name": "bar",
             "DataType": "STRING"
+          },
+          {
+            "Name": "baz",
+            "DataType": "RECORD",
+            "Children": [
+              {
+                "Name": "a",
+                "DataType": "INT"
+              },
+              {
+                "Name": "b",
+                "DataType": "FLOAT64"
+              }
+            ]
           }
         ]
       }
     ]
   }
 ]
-
 ```
 
 See the [example](./example) folder for more usage.
