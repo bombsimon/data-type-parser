@@ -40,7 +40,7 @@ func (p *Parser) ParseTop() (Ast, bool) {
 
 	switch t.Type {
 	case TokenIdent:
-		i, ok := p.ParseIdent()
+		i, ok := p.ParseIdent(t.Value)
 		if !ok {
 			return Ast{
 				DataType:    t.Value,
@@ -49,19 +49,28 @@ func (p *Parser) ParseTop() (Ast, bool) {
 			}, true
 		}
 
-		return i, ok
-	case TokenStruct:
-		return p.ParseStruct()
-	case TokenArray:
-		a, ok := p.ParseArray()
-		if !ok {
-			panic("Expected array")
+		// We got an ident but without any data type, this means the data type
+		// wasn't an ident but a complex type so we parse it and set our ident
+		// as the name for the complex type.
+		if i.DataType == "" {
+			top, ok := p.ParseTop()
+			if !ok {
+				panic("Expected data type")
+			}
+
+			top.Name = i.Name
+
+			return top, true
 		}
+
+		return i, ok
+	case TokenStruct, TokenArray:
+		p.Lexer.Next() // Consuem `<` or `(`
 
 		return Ast{
 			Name:        "",
-			DataType:    string(TokenArray),
-			Children:    []Ast{a},
+			DataType:    string(t.Type),
+			Children:    p.ParseContainer(),
 			ExtraTokens: p.ParseExtraTokens(),
 		}, true
 	default:
@@ -71,98 +80,70 @@ func (p *Parser) ParseTop() (Ast, bool) {
 	return Ast{}, false
 }
 
-func (p *Parser) ParseStruct() (Ast, bool) {
-	t := p.Lexer.Next()
-	if t.Type != TokenLess {
-		panic(fmt.Sprintf("Expected %v, got %v", TokenLess, t.Type))
-	}
-
-	children := []Ast{}
+func (p *Parser) ParseContainer() []Ast {
+	var nodes []Ast
 
 	for {
-		child, ok := p.ParseIdent()
+		child, ok := p.ParseTop()
 		if !ok {
 			break
 		}
 
-		children = append(children, child)
+		nodes = append(nodes, child)
 
-		if t := p.Lexer.Peek(); t.Type == TokenComma {
-			p.Lexer.Next() // Consume `,`
+		next := p.Lexer.Peek()
+		if next != nil {
+			if next.Type == TokenComma {
+				p.Lexer.Next() // Consume `,`
+			}
+
+			if next.Type == TokenGreater || next.Type == TokenRParen {
+				break // End of container
+			}
 		}
 	}
 
-	p.Lexer.Next() // Consume >
+	p.Lexer.Next() // Consume `>` or `)`
 
-	return Ast{
-		DataType:    string(TokenStruct),
-		Children:    children,
-		ExtraTokens: p.ParseExtraTokens(),
-	}, true
+	return nodes
 }
 
-func (p *Parser) ParseArray() (Ast, bool) {
-	t := p.Lexer.Next()
-	if t.Type != TokenLess {
-		panic(fmt.Sprintf("Expected %v, got %v", TokenLess, t.Type))
-	}
-
-	a, ok := p.ParseTop()
-
-	p.Lexer.Next() // Consume >
-
-	return a, ok
-}
-
-func (p *Parser) ParseIdent() (Ast, bool) {
+func (p *Parser) ParseIdent(ident string) (Ast, bool) {
 	// We only care about idents (name, type, nullability). If it's something
 	// else it's most likely a `TokenGreater` or EOF.
-	if name := p.Lexer.Peek(); name != nil && name.Type != TokenIdent {
-		return Ast{}, false
-	}
-
-	name := p.Lexer.Next()
-	if name == nil {
-		return Ast{}, false
-	}
-
-	typ := p.Lexer.Next()
+	typ := p.Lexer.Peek()
 	if typ == nil {
 		return Ast{}, false
 	}
 
-	switch typ.Type {
-	case TokenIdent:
+	// Size container for ident only, not an alias
+	if typ.Type == TokenLParen {
 		return Ast{
-			Name:        name.Value,
-			DataType:    typ.Value,
+			DataType:    ident,
 			Size:        p.ParseSize(),
-			ExtraTokens: p.ParseExtraTokens(),
-		}, true
-	case TokenStruct:
-		child, ok := p.ParseStruct()
-		if !ok {
-			panic("Expected child")
-		}
-
-		child.Name = name.Value
-
-		return child, true
-	case TokenArray:
-		child, ok := p.ParseArray()
-		if !ok {
-			panic("Expected child")
-		}
-
-		return Ast{
-			Name:        name.Value,
-			DataType:    string(TokenArray),
-			Children:    []Ast{child},
 			ExtraTokens: p.ParseExtraTokens(),
 		}, true
 	}
 
-	return Ast{}, false
+	if typ.Type != TokenIdent {
+		return Ast{
+			Name: ident,
+		}, true
+	}
+
+	p.Lexer.Next() // Consume the data type, it's an ident
+
+	switch typ.Type {
+	case TokenIdent:
+		return Ast{
+			Name:        ident,
+			DataType:    typ.Value,
+			Size:        p.ParseSize(),
+			ExtraTokens: p.ParseExtraTokens(),
+		}, true
+	default:
+		return Ast{}, false
+	}
 }
 
 func (p *Parser) ParseSize() int {
